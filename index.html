@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GAC — Gian Abel's (Offline)</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#031a3a;        /* deep blue */
+    --panel:#04203f;
+    --card:#05263f;
+    --muted:#a8b7d1;
+    --text:#f3f6fb;
+    --accent:#ffcc33;    /* gold */
+    --accent-2:#ffd966;
+    --danger:#ff6b6b;
+    --success:#2ecc71;
+    --border: rgba(255,255,255,0.04);
+    --dot:#bfbfbf;
+    --maxw:1100px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg), #03132b 140%);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:var(--maxw); margin:16px auto; padding:18px;}
+
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0}
+  .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
+  .brand .logo-placeholder{width:64px;height:64px;border-radius:10px;background:linear-gradient(180deg,#052a4a,#04203f);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-family:Montserrat, sans-serif}
+  .brand h1{margin:0;font-family:Montserrat, sans-serif;font-size:20px;color:var(--accent);letter-spacing:0.6px}
+
+  .hamburger{display:none; width:44px;height:44px;border-radius:10px;background:transparent;border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer}
+  .hamburger div{width:18px;height:2px;background:var(--text);margin:3px 0;border-radius:2px}
+
+  nav{display:flex; gap:14px; align-items:center}
+  nav a{font-weight:600;text-decoration:none;color:var(--muted);padding:8px 10px;border-radius:8px}
+  nav a:hover{color:var(--text); background:rgba(255,255,255,0.02)}
+  .cta{background:var(--accent); color:#072033; padding:9px 12px; border-radius:10px; font-weight:700; text-decoration:none}
+
+  /* Hero */
+  .hero{display:flex; gap:20px; align-items:center; margin:18px 0; padding:18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid var(--border)}
+  .hero-left{flex:1}
+  .hero-title{font-family:Montserrat, sans-serif;font-size:28px;margin:0;color:var(--accent)}
+  .hero-sub{color:var(--muted);margin-top:8px}
+  .mockup{width:100%;max-width:320px;height:200px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--muted);background:linear-gradient(180deg,#04223e,#031a33)}
+
+  /* Sections */
+  section{margin:22px 0}
+  .grid{display:grid;gap:14px}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .card{padding:12px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,#041a30,#031427)}
+  .product-img{width:100%;height:170px;border-radius:8px;background:#0a2033;object-fit:cover;display:block}
+  .product-title{font-weight:700;margin-top:8px;color:var(--text)}
+  .product-price{color:var(--muted);margin-top:6px}
+
+  .btn{background:var(--accent); color:#072033; padding:8px 10px; border-radius:8px; border:0; cursor:pointer; font-weight:700}
+  .btn.secondary{background:#0d2b40; color:var(--text)}
+  .muted{color:var(--muted)}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* Cart panel */
+  .cart-panel{position:fixed; right:18px; top:80px; width:360px; max-height:75vh; overflow:auto; border-radius:12px; border:1px solid var(--border); padding:12px; background:linear-gradient(180deg,#02121f,#011018); box-shadow:0 18px 60px rgba(0,0,0,0.6); z-index:900}
+  .cart-row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+
+  /* Admin dot */
+  #adminDot{position:fixed; right:18px; bottom:14px; width:18px; height:18px; border-radius:50%; background:var(--dot); border:0; cursor:pointer; z-index:9999; box-shadow:0 6px 18px rgba(0,0,0,0.4); transition:transform .15s ease}
+  #adminDot.glow{box-shadow:0 8px 30px rgba(255,204,51,0.18), 0 6px 18px rgba(0,0,0,0.5); transform:scale(1.05)}
+
+  /* Modal & admin */
+  .backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9998}
+  .modal{width:1000px; max-width:96%; max-height:92vh; overflow:auto; background:linear-gradient(180deg,#061a2b,#041422); border-radius:12px; padding:16px; border:1px solid var(--border); box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+  .grid-2{display:grid; grid-template-columns:1fr 420px; gap:12px}
+  input,textarea,select{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+  input::placeholder, textarea::placeholder{color:rgba(255,255,255,0.35)}
+  label.small{font-size:13px;color:var(--muted)}
+  .status-pill{padding:6px 8px;border-radius:8px;font-weight:700;font-size:13px}
+  .status-pending{background:#133048;color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+  .status-paid{background:linear-gradient(90deg,#3b6b18,#6fbf37);color:#021205}
+  .status-shipped{background:linear-gradient(90deg,#1b4f6a,#2c8ab3);color:#eaf8ff}
+  .status-delivered{background:linear-gradient(90deg,#6a4b12,#9a6f2b);color:#061205}
+
+  @media(max-width:980px){
+    .cols-3{grid-template-columns:repeat(2,1fr)}
+    .grid-2{grid-template-columns:1fr}
+    .cart-panel{display:none}
+    .hamburger{display:flex}
+    nav{display:none}
+  }
+  @media(max-width:560px){
+    .cols-3{grid-template-columns:1fr}
+    .hero-title{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="#">
+      <div class="logo-placeholder" id="logoPlaceholder">GA</div>
+      <h1 id="brandText">Gian Abel's</h1>
+    </a>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <div></div><div></div><div></div>
+    </button>
+
+    <nav id="topNav">
+      <a href="#products">Products</a>
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+      <a class="cta" href="#products">Shop</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-left">
+      <h2 class="hero-title" id="heroTitle">Gian Abel's</h2>
+      <p class="hero-sub" id="heroSub">Where style meets technology — premium apparel & thoughtfully crafted accessories.</p>
+      <div style="margin-top:12px">
+        <a class="btn" href="#products">Explore Collection</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="mockup" id="heroMock">Brand / Product Image</div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section id="products">
+    <div style="display:flex; justify-content:space-between; align-items:end; gap:12px;">
+      <h3>Products</h3>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="small muted">Prices shown in</div>
+        <div style="font-weight:700; color:var(--accent)">Ksh</div>
+        <div>
+          <input id="convAmount" type="number" value="1000" style="width:120px">
+        </div>
+        <select id="convTo" style="padding:8px;border-radius:8px"></select>
+        <button class="btn secondary" id="convertBtn">Convert</button>
+      </div>
+    </div>
+
+    <div class="grid cols-3" id="productsGrid" style="margin-top:12px"></div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <h3>Contact</h3>
+    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:260px;">
+        <h5>Email</h5>
+        <p class="muted"><a id="publicEmail" href="#">Set in Admin</a></p>
+        <h5>Location</h5>
+        <p class="muted" id="publicLocation">Set in Admin</p>
+      </div>
+
+      <div style="flex:1; min-width:260px;">
+        <h5>Send a message</h5>
+        <form id="contactForm" onsubmit="event.preventDefault(); handleContact()" style="display:grid; gap:8px;">
+          <input name="name" placeholder="Full name" required>
+          <input name="email" placeholder="you@domain.com" required>
+          <textarea name="message" placeholder="Message" rows="4" required></textarea>
+          <div style="display:flex; gap:8px;">
+            <button class="btn">Send Message</button>
+            <button class="btn secondary" type="button" onclick="saveDraft()">Save Draft</button>
+          </div>
+        </form>
+        <p class="small muted">Messages saved locally and visible to admin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About (last) -->
+  <section id="about">
+    <h3>About</h3>
+    <p class="muted" id="aboutText">GAC (Gian Abel's) creates functional style — garments and tech accessories built to last and designed for life.</p>
+  </section>
+
+  <footer style="margin-top:24px; color:var(--muted)">
+    © <span id="year"></span> Gian Abel's — All rights reserved.
+  </footer>
+</div>
+
+<!-- Cart panel -->
+<div id="cartPanel" class="cart-panel" style="display:none">
+  <h4 style="margin:0 0 8px 0">Your Cart</h4>
+  <div id="cartItems"></div>
+  <div id="cartTotal" class="small muted" style="margin-top:8px"></div>
+  <div style="display:flex; gap:8px; margin-top:10px;">
+    <button class="btn" id="checkoutBtn">Checkout</button>
+    <button class="btn secondary" id="clearCartBtn">Clear</button>
+  </div>
+</div>
+
+<!-- Admin dot -->
+<button id="adminDot" title="Admin"></button>
+
+<!-- Admin modal -->
+<div id="adminModal" class="backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <!-- Login area -->
+    <div id="adminLoginArea">
+      <h3 id="adminTitle">Admin Login</h3>
+      <p class="muted">Enter admin password to manage the site. Default password: <strong>madafakaGIAN@254</strong></p>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input id="adminPassword" type="password" placeholder="Password" style="flex:1">
+        <button class="btn" id="adminEnter">Enter</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn secondary" id="closeAdmin">Close</button>
+      </div>
+      <p class="small muted" style="margin-top:8px">All data is stored locally (in your browser). Export backups regularly.</p>
+    </div>
+
+    <!-- Admin main -->
+    <div id="adminMain" style="display:none; margin-top:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0">Admin Dashboard</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn secondary" id="adminLogout">Logout</button>
+          <button class="btn secondary" id="adminCloseMain">Close</button>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:12px;">
+        <!-- LEFT column -->
+        <div>
+          <h4>Site Editor</h4>
+          <div style="display:grid; gap:8px;">
+            <label class="small">Brand (text)</label>
+            <input id="adminBrand" type="text">
+            <label class="small">Hero subtitle</label>
+            <input id="adminHero" type="text">
+            <label class="small">About</label>
+            <textarea id="adminAbout" rows="3"></textarea>
+            <label class="small">Public location</label>
+            <input id="adminLocation" type="text">
+            <label class="small">Public email</label>
+            <input id="adminPublicEmail" type="text">
+            <label class="small">Logo (URL or base64)</label>
+            <input id="adminLogoUrl" type="url">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="adminLogoFile" type="file" accept="image/*">
+              <button class="btn secondary" id="useAdminLogoFile">Use File</button>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" id="saveSiteBtn">Save Site</button>
+              <button class="btn secondary" id="resetSiteBtn">Reset Defaults</button>
+            </div>
+          </div>
+
+          <hr style="margin:12px 0; border-color:var(--border)">
+
+          <h4>Products Manager</h4>
+          <div style="display:grid; gap:8px;">
+            <label class="small">Image (URL or base64)</label><input id="adminProdImage" type="url">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="adminProdFile" type="file" accept="image/*">
+              <button class="btn secondary" id="useAdminProdFile">Use File</button>
+            </div>
+            <label class="small">Name</label><input id="adminProdName" type="text">
+            <label class="small">Price (Ksh)</label><input id="adminProdPrice" type="number" step="0.01">
+            <label class="small">Description</label><textarea id="adminProdDesc" rows="2"></textarea>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" id="addProductBtn">Add Product</button>
+              <button class="btn secondary" id="updateProductBtn" style="display:none">Update</button>
+              <button class="btn secondary" id="clearProdFormBtn">Clear</button>
+            </div>
+
+            <div>
+              <h5 style="margin:8px 0 6px 0">Existing Products</h5>
+              <div id="adminProductsList" style="max-height:220px; overflow:auto; border:1px solid var(--border); padding:8px; border-radius:8px;"></div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn" id="exportProductsBtn">Export Products</button>
+                <button class="btn secondary" id="importProductsBtn">Import Products</button>
+              </div>
+            </div>
+          </div>
+
+          <hr style="margin:12px 0; border-color:var(--border)">
+
+          <h4>Orders</h4>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button class="btn" id="exportOrdersBtn">Export Orders</button>
+            <button class="btn secondary" id="clearOrdersBtn">Clear Orders</button>
+            <button class="btn secondary" id="exportAllBtn">Export ALL Backup</button>
+            <button class="btn secondary" id="importAllBtn">Import ALL Backup</button>
+          </div>
+          <div id="adminOrders" style="max-height:260px; overflow:auto; border:1px solid var(--border); padding:8px; border-radius:8px;"></div>
+        </div>
+
+        <!-- RIGHT column -->
+        <div>
+          <h4>Payment Accounts / Tills</h4>
+          <label class="small">Account Holder</label><input id="payHolder" type="text">
+          <label class="small">Type</label>
+          <select id="payType"><option>M-Pesa</option><option>Airtel Money</option><option>Bank Transfer</option><option>MasterCard</option><option>Visa</option><option>Other</option></select>
+          <label class="small">Number / Till / IBAN</label><input id="payNumber" type="text">
+          <label class="small">Notes</label><input id="payNotes" type="text">
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" id="addPayBtn">Add Account</button>
+            <button class="btn secondary" id="updatePayBtn" style="display:none">Update</button>
+            <button class="btn secondary" id="clearPayFormBtn">Clear</button>
+          </div>
+          <div style="margin-top:10px;">
+            <h5>Saved Accounts</h5>
+            <div id="adminPaysList" style="max-height:200px; overflow:auto; border:1px solid var(--border); padding:8px; border-radius:8px;"></div>
+          </div>
+
+          <hr style="margin:12px 0; border-color:var(--border)">
+
+          <h4>Messages</h4>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button class="btn" id="exportMsgsBtn">Export Messages</button>
+            <button class="btn secondary" id="clearMsgsBtn">Clear Messages</button>
+          </div>
+          <div id="adminMessagesList" style="max-height:260px; overflow:auto; border:1px solid var(--border); padding:8px; border-radius:8px;"></div>
+
+          <hr style="margin:12px 0; border-color:var(--border)">
+
+          <h4>Admin Account</h4>
+          <label class="small">Admin email</label><input id="adminEmailInput" type="text">
+          <label class="small">Default payment destination (admin only)</label><input id="adminDefaultDest" type="text" placeholder="0783059336">
+          <div style="margin:8px 0;"><label><input id="adminShowFull" type="checkbox"> Show full numbers publicly</label></div>
+          <div style="display:flex; gap:8px;"><button class="btn" id="saveAdminSettingsBtn">Save Admin Settings</button></div>
+
+          <hr style="margin:12px 0; border-color:var(--border)">
+
+          <h4>Security</h4>
+          <label class="small">Change admin password</label><input id="newAdminPass" type="password" placeholder="New password">
+          <div style="display:flex; gap:8px; margin-top:8px;"><button class="btn" id="changePassBtn">Change Password</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  Single-file offline demo app for Gian Abel's (GAC)
+  - All data in localStorage
+  - Default admin password: madafakaGIAN@254 (hashed)
+  - Admin open via:
+      * click glowing dot
+      * Ctrl+Shift+A (desktop)
+      * triple-tap bottom-right (mobile)
+  - Ksh primary, offline converter with local rates table
+  - Export all / Import all backups
+*/
+
+// Keys
+const KEY_SITE = 'gac_site_v3';
+const KEY_PRODS = 'gac_prods_v3';
+const KEY_PAYS = 'gac_pays_v3';
+const KEY_ORDERS = 'gac_orders_v3';
+const KEY_MSGS = 'gac_msgs_v3';
+const KEY_ADMIN = 'gac_admin_v3';
+const KEY_CART = 'gac_cart_v3';
+const KEY_RATES = 'gac_rates_v3'; // offline rates table
+
+// utilities
+const $ = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function load(k, fallback){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+// SHA-256 hashing for password
+async function sha256Hex(msg){
+  const enc = new TextEncoder().encode(msg);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// seed defaults
+async function seedDefaults(){
+  if(!localStorage.getItem(KEY_ADMIN)){
+    const ph = await sha256Hex('madafakaGIAN@254');
+    save(KEY_ADMIN, { passwordHash: ph, email:'', defaultDest:'0783059336', showFull:false });
+  }
+  if(!localStorage.getItem(KEY_SITE)){
+    save(KEY_SITE, {
+      brand: "Gian Abel's",
+      hero: "Where style meets technology",
+      about: "GAC (Gian Abel's) creates functional style — garments and tech accessories built to last.",
+      logoData: "", // base64 or url
+      location: "Online-first boutique. Edit in Admin.",
+      publicEmail: ""
+    });
+  }
+  if(!localStorage.getItem(KEY_PRODS)){
+    save(KEY_PRODS, [
+      {id:Date.now()+1, name:'Black Logo Hoodie', price_ksh:4000, image:'', description:'Premium cotton hoodie with the GAC mark.'},
+      {id:Date.now()+2, name:'Tech Minimal Jacket', price_ksh:9500, image:'', description:'Water-resistant jacket with cable routing.'},
+      {id:Date.now()+3, name:'GAC Wireless Case', price_ksh:2000, image:'', description:'Compact case for earbuds.'}
+    ]);
+  }
+  if(!localStorage.getItem(KEY_PAYS)){
+    save(KEY_PAYS, [
+      {id:Date.now()+11, name:"GAC M-Pesa Till", type:"M-Pesa", number:"0783059336", notes:"Default till (editable)"},
+      {id:Date.now()+12, name:"GAC Bank", type:"Bank Transfer", number:"KE00123456789", notes:"Bank placeholder"}
+    ]);
+  }
+  if(!localStorage.getItem(KEY_ORDERS)) save(KEY_ORDERS, []);
+  if(!localStorage.getItem(KEY_MSGS)) save(KEY_MSGS, []);
+  if(!localStorage.getItem(KEY_CART)) save(KEY_CART, []);
+  // offline rates (KSH -> target) simple table, can be edited in localStorage later
+  if(!localStorage.getItem(KEY_RATES)){
+    save(KEY_RATES, {
+      ts: Date.now(),
+      rates: { USD:0.0068, EUR:0.0062, GBP:0.0052, UGX:25.3, TZS:15.8, ZAR:0.12, NGN:3.0, GHS:0.036, AUD:0.0096, CAD:0.0089, JPY:0.96, CNY:0.048 }
+    });
+  }
+}
+
+// initial boot
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await seedDefaults();
+  wireUI();
+  renderAll();
+  populateConverter();
+  // add triple-tap listener
+  initTripleTap();
+  // make admin dot glow briefly
+  setTimeout(()=> $('adminDot').classList.add('glow'), 400);
+  setTimeout(()=> $('adminDot').classList.remove('glow'), 2000);
+});
+
+// wire UI
+function wireUI(){
+  // hamburger for small screens
+  $('hamburgerBtn').addEventListener('click', ()=> {
+    const nav = $('topNav');
+    if(nav.style.display === 'flex' || nav.style.display === '') nav.style.display = 'none';
+    else nav.style.display = 'flex';
+  });
+
+  // admin open/close
+  $('adminDot').addEventListener('click', openAdminModal);
+  $('closeAdmin').addEventListener('click', closeAdminModal);
+  $('adminCloseMain').addEventListener('click', closeAdminModal);
+  $('adminLogout').addEventListener('click', ()=> { closeAdminModal(); location.reload(); });
+
+  // keyboard shortcut Ctrl+Shift+A
+  document.addEventListener('keydown', (e)=> {
+    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a'){ openAdminModal(); }
+  });
+
+  // admin login
+  $('adminEnter').addEventListener('click', adminLogin);
+  $('adminPassword').addEventListener('keydown', e=>{ if(e.key === 'Enter') adminLogin(); });
+
+  // site editor
+  $('useAdminLogoFile').addEventListener('click', ()=> {
+    const f = $('adminLogoFile').files[0]; if(!f) return alert('Choose file');
+    const r = new FileReader(); r.onload = ev => { $('adminLogoUrl').value = ev.target.result; alert('Logo loaded to URL field (base64).'); }; r.readAsDataURL(f);
+  });
+  $('saveSiteBtn').addEventListener('click', saveSiteChanges);
+  $('resetSiteBtn').addEventListener('click', resetSite);
+
+  // product admin
+  $('useAdminProdFile').addEventListener('click', ()=> {
+    const f = $('adminProdFile').files[0]; if(!f) return alert('Choose file');
+    const r = new FileReader(); r.onload = ev => { $('adminProdImage').value = ev.target.result; alert('Product image loaded to image field (base64).'); }; r.readAsDataURL(f);
+  });
+  $('addProductBtn').addEventListener('click', addProduct);
+  $('updateProductBtn').addEventListener('click', updateProduct);
+  $('clearProdFormBtn').addEventListener('click', clearProdForm);
+  $('exportProductsBtn').addEventListener('click', ()=> { downloadFile(JSON.stringify(load(KEY_PRODS,[]),null,2),'gac_products.json'); });
+  $('importProductsBtn').addEventListener('click', importProductsPrompt);
+
+  // payments admin
+  $('addPayBtn').addEventListener('click', addPay);
+  $('clearPayFormBtn').addEventListener('click', clearPayForm);
+
+  // orders admin
+  $('exportOrdersBtn').addEventListener('click', ()=> { downloadFile(JSON.stringify(load(KEY_ORDERS,[]),null,2),'gac_orders.json'); });
+  $('clearOrdersBtn').addEventListener('click', ()=> { if(confirm('Clear all orders?')){ save(KEY_ORDERS,[]); renderAdminOrders(); }});
+
+  // messages admin
+  $('exportMsgsBtn').addEventListener('click', ()=> { downloadFile(JSON.stringify(load(KEY_MSGS,[]),null,2),'gac_messages.json'); });
+  $('clearMsgsBtn').addEventListener('click', ()=> { if(confirm('Clear messages?')){ save(KEY_MSGS,[]); renderAdminMessages(); }});
+
+  // admin settings
+  $('saveAdminSettingsBtn').addEventListener('click', saveAdminSettings);
+  $('changePassBtn').addEventListener('click', changeAdminPassword);
+
+  // cart & checkout
+  $('clearCartBtn').addEventListener('click', ()=> { if(confirm('Clear cart?')){ save(KEY_CART,[]); renderCart(); }});
+  $('checkoutBtn').addEventListener('click', openCheckout);
+
+  // shop top
+  $('convertBtn').addEventListener('click', convertFromKsh);
+
+  // export/import all
+  $('exportAllBtn').addEventListener('click', exportAllBackup);
+  $('importAllBtn').addEventListener('click', importAllPrompt);
+}
+
+// rendering
+function renderAll(){
+  renderSite();
+  renderProducts();
+  renderPaymentsPublic();
+  renderCart();
+  renderAdminLists();
+  renderAdminOrders();
+  renderAdminMessages();
+  $('year').textContent = new Date().getFullYear();
+}
+
+function renderSite(){
+  const s = load(KEY_SITE, {});
+  $('brandText').textContent = s.brand || "Gian Abel's";
+  $('heroTitle') && ($('heroTitle').textContent = s.brand || "Gian Abel's");
+  $('heroSub').textContent = s.hero || '';
+  $('aboutText').textContent = s.about || '';
+  $('publicLocation').textContent = s.location || '';
+  if(s.publicEmail){ $('publicEmail').textContent = s.publicEmail; $('publicEmail').href = 'mailto:' + s.publicEmail; } else { $('publicEmail').textContent = 'Set in Admin'; $('publicEmail').href='#'; }
+  // logo
+  if(s.logoData){
+    // set logo placeholder to image
+    const el = document.createElement('img');
+    el.src = s.logoData; el.alt = 'logo'; el.style.width='64px'; el.style.height='64px'; el.style.borderRadius='8px'; el.style.objectFit='contain';
+    const ph = $('logoPlaceholder'); ph.innerHTML=''; ph.appendChild(el);
+  } else {
+    $('logoPlaceholder').textContent = (s.brand || "Gian Abel's").split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  }
+}
+
+// products public
+function renderProducts(){
+  const prods = load(KEY_PRODS, []);
+  const grid = $('productsGrid'); grid.innerHTML = '';
+  if(!prods.length){ grid.innerHTML = '<div class="muted">No products — add some from Admin.</div>'; return; }
+  prods.forEach(p=>{
+    const el = document.createElement('div'); el.className = 'card';
+    el.innerHTML = `
+      <img class="product-img" src="${esc(p.image||'')}" alt="${esc(p.name)}" onerror="this.style.backgroundColor='#071b2a'">
+      <div class="product-title">${esc(p.name)}</div>
+      <div class="product-price">Ksh ${Number(p.price_ksh||0).toLocaleString()}</div>
+      <div class="small muted" style="margin-top:8px">${esc(p.description||'')}</div>
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button class="btn" onclick="addToCart(${p.id})">Add to cart</button>
+        <button class="btn secondary" onclick="quickOrder(${p.id})">Shop</button>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+// payments public
+function renderPaymentsPublic(){
+  const pays = load(KEY_PAYS, []);
+  // optional: show in contact or separate — for now keep invisible publicly except in admin (or show masked)
+  // We'll set public display under contact if admin allows; but renderPaymentsPublic can be used to refresh admin list
+  renderAdminPays();
+}
+
+// CART
+function loadCart(){ return load(KEY_CART, []); }
+function saveCart(c){ save(KEY_CART, c); renderCart(); }
+
+function addToCart(prodId){
+  const prods = load(KEY_PRODS, []);
+  const p = prods.find(x=>String(x.id)===String(prodId)); if(!p) return alert('Product not found');
+  const cart = loadCart();
+  const ex = cart.find(i=>String(i.id)===String(prodId));
+  if(ex) ex.qty = (ex.qty||1) + 1; else cart.push({ id: p.id, name: p.name, price_ksh: p.price_ksh, image: p.image, qty: 1 });
+  saveCart(cart);
+  alert('Added to cart');
+}
+
+function renderCart(){
+  const cart = loadCart();
+  const panel = $('cartPanel');
+  if(!cart.length){ panel.style.display='none'; return; }
+  panel.style.display='block';
+  const itemsDiv = $('cartItems'); itemsDiv.innerHTML = '';
+  let total = 0;
+  cart.forEach((it, idx)=>{
+    total += (it.qty||1) * Number(it.price_ksh||0);
+    const row = document.createElement('div'); row.className='cart-row';
+    row.innerHTML = `<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;background:#081018"><img src="${esc(it.image||'')}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.backgroundColor='#071018'"></div>
+      <div style="flex:1"><div style="font-weight:700">${esc(it.name)}</div><div class="small muted">Ksh ${Number(it.price_ksh).toLocaleString()} × <input type="number" value="${it.qty}" min="1" style="width:60px" onchange="updateCartQty(${idx}, this.value)"></div></div>
+      <div><button class="btn secondary" onclick="removeCartItem(${idx})">Remove</button></div>`;
+    itemsDiv.appendChild(row);
+  });
+  $('cartTotal').textContent = 'Total: Ksh ' + total.toLocaleString();
+}
+
+function updateCartQty(idx, val){ const cart = loadCart(); cart[idx].qty = Math.max(1, Number(val)||1); saveCart(cart); renderCart(); }
+function removeCartItem(idx){ const cart = loadCart(); cart.splice(idx,1); save(KEY_CART, cart); renderCart(); }
+function quickOrder(prodId){ const prods = load(KEY_PRODS, []); const p = prods.find(x=>String(x.id)===String(prodId)); if(!p) return alert('Not found'); save(KEY_CART, [{ id:p.id, name:p.name, price_ksh:p.price_ksh, image:p.image, qty:1 }]); renderCart(); openCheckout(); }
+
+function openCheckout(){
+  const cart = loadCart(); if(!cart.length) return alert('Cart empty');
+  const total = cart.reduce((s,i)=> s + (i.price_ksh * (i.qty||1)), 0);
+  const modal = document.createElement('div'); modal.style.position='fixed'; modal.style.inset=0; modal.style.background='rgba(0,0,0,0.72)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center'; modal.style.zIndex=99999;
+  const box = document.createElement('div'); box.style.width='520px'; box.style.maxWidth='96%'; box.style.background='linear-gradient(180deg,#041a2b,#02121f)'; box.style.border='1px solid rgba(255,255,255,0.03)'; box.style.borderRadius='10px'; box.style.padding='16px';
+  box.innerHTML = `<h3 style="margin:0 0 10px 0">Checkout</h3>
+    <div style="max-height:220px; overflow:auto; border:1px solid rgba(255,255,255,0.03); padding:8px; border-radius:8px; margin-bottom:8px">
+      ${cart.map(it=>`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><div>${esc(it.name)} × ${it.qty}</div><div>Ksh ${(it.price_ksh * it.qty).toLocaleString()}</div></div>`).join('')}
+      <div style="border-top:1px dashed rgba(255,255,255,0.03); margin-top:8px; padding-top:8px"><strong>Total: Ksh ${total.toLocaleString()}</strong></div>
+    </div>
+    <div style="display:grid; gap:8px;">
+      <input id="ordName" placeholder="Full name" />
+      <input id="ordPhone" placeholder="Phone number" />
+      <input id="ordLocation" placeholder="Delivery location / address" />
+      <textarea id="ordNote" placeholder="Note (size, color, instructions)" rows="2"></textarea>
+      <label class="small">Payment method</label>
+      <select id="ordPayment"><option>M-Pesa</option><option>Airtel Money</option><option>Bank Transfer</option><option>Card (simulated)</option><option>Cash on Delivery</option></select>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button class="btn" id="confirmOrderBtn">Confirm & Pay (Simulated)</button>
+      <button class="btn secondary" id="cancelOrderBtn">Cancel</button>
+    </div>`;
+  modal.appendChild(box); document.body.appendChild(modal);
+
+  $('cancelOrderBtn').addEventListener('click', ()=> modal.remove());
+  $('confirmOrderBtn').addEventListener('click', ()=>{
+    const name = $('ordName').value.trim(), phone = $('ordPhone').value.trim(), location = $('ordLocation').value.trim();
+    if(!name||!phone||!location) return alert('Name, phone and delivery location are required.');
+    const order = { id:Date.now(), items: cart, total_ksh: total, customer: { name, phone, location, note: $('ordNote').value.trim() }, payment_method: $('ordPayment').value, status: 'pending', ts: new Date().toISOString() };
+    const arr = load(KEY_ORDERS, []); arr.unshift(order); save(KEY_ORDERS, arr);
+    save(KEY_CART, []); renderCart(); modal.remove(); alert('Order placed (simulated). Admin can view orders in dashboard.'); renderAdminOrders();
+  });
+}
+
+// contact
+function handleContact(){ const f = $('contactForm'); const name=f.name.value.trim(), email=f.email.value.trim(), message=f.message.value.trim(); if(!name||!email||!message) return alert('Please fill all fields.'); const arr = load(KEY_MSGS, []); arr.unshift({ id:Date.now(), name, email, message, ts: new Date().toISOString() }); save(KEY_MSGS, arr); alert('Message saved. Admin will see it.'); f.reset(); renderAdminMessages(); }
+function saveDraft(){ const f = $('contactForm'); const d = { name:f.name.value, email:f.email.value, message:f.message.value, ts: new Date().toISOString() }; localStorage.setItem('gac_contact_draft', JSON.stringify(d)); alert('Draft saved locally.'); }
+
+// Admin open / login
+function openAdminModal(){ $('adminModal').style.display='flex'; $('adminModal').setAttribute('aria-hidden','false'); $('adminPassword').focus(); }
+function closeAdminModal(){ $('adminModal').style.display='none'; $('adminModal').setAttribute('aria-hidden','true'); $('adminLoginArea').style.display='block'; $('adminMain').style.display='none'; }
+async function adminLogin(){
+  const pass = $('adminPassword').value || ''; const adm = load(KEY_ADMIN, {});
+  if(!adm || !adm.passwordHash) return alert('Admin not configured');
+  const h = await sha256Hex(pass);
+  if(h === adm.passwordHash){
+    $('adminLoginArea').style.display='none'; $('adminMain').style.display='block'; $('adminPassword').value=''; renderAdminLists(); renderAdminOrders(); renderAdminMessages();
+  } else alert('Incorrect password');
+}
+
+// Admin site editor
+function saveSiteChanges(){
+  const s = load(KEY_SITE, {});
+  s.brand = $('adminBrand').value.trim();
+  s.hero = $('adminHero').value.trim();
+  s.about = $('adminAbout').value.trim();
+  s.location = $('adminLocation').value.trim();
+  s.publicEmail = $('adminPublicEmail').value.trim();
+  s.logoData = $('adminLogoUrl').value.trim();
+  save(KEY_SITE, s);
+  renderSite();
+  alert('Site changes saved locally.');
+}
+function resetSite(){ if(!confirm('Reset site defaults?')) return; localStorage.removeItem(KEY_SITE); renderSite(); alert('Reset.'); }
+
+// Admin products
+function addProduct(){ const name=$('adminProdName').value.trim(); if(!name) return alert('Name required'); const price=Number($('adminProdPrice').value)||0; const image=$('adminProdImage').value.trim(); const desc=$('adminProdDesc').value.trim(); const arr=load(KEY_PRODS,[]); arr.unshift({ id:Date.now(), name, price_ksh:price, image, description:desc }); save(KEY_PRODS, arr); renderProducts(); renderAdminProducts(); clearProdForm(); alert('Product added.'); }
+function clearProdForm(){ $('adminProdImage').value=''; $('adminProdFile').value=''; $('adminProdName').value=''; $('adminProdPrice').value=''; $('adminProdDesc').value=''; $('updateProductBtn').style.display='none'; $('addProductBtn').style.display='inline-block'; delete $('addProductBtn').dataset.editId; }
+function renderAdminProducts(){ const arr=load(KEY_PRODS,[]); const list=$('adminProductsList'); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="small muted">No products</div>'; return; } arr.forEach(p=>{ const r=document.createElement('div'); r.style.display='flex'; r.style.justifyContent='space-between'; r.style.alignItems='center'; r.style.marginBottom='8px'; r.innerHTML=`<div><strong>${esc(p.name)}</strong><div class="small muted">Ksh ${Number(p.price_ksh).toLocaleString()}</div></div><div style="display:flex;gap:6px"><button class="btn" onclick="editProduct(${p.id})">Edit</button><button class="btn secondary" onclick="deleteProduct(${p.id})">Delete</button></div>`; list.appendChild(r); }); }
+function editProduct(id){ const arr=load(KEY_PRODS,[]); const p=arr.find(x=>String(x.id)===String(id)); if(!p) return alert('Not found'); $('adminProdImage').value=p.image||''; $('adminProdName').value=p.name||''; $('adminProdPrice').value=p.price_ksh||''; $('adminProdDesc').value=p.description||''; $('addProductBtn').dataset.editId=id; $('updateProductBtn').style.display='inline-block'; $('addProductBtn').style.display='none'; }
+function updateProduct(){ const id=$('addProductBtn').dataset.editId; if(!id) return alert('No product selected'); const arr=load(KEY_PRODS,[]); const idx=arr.findIndex(x=>String(x.id)===String(id)); if(idx===-1) return alert('Not found'); arr[idx].image=$('adminProdImage').value.trim(); arr[idx].name=$('adminProdName').value.trim(); arr[idx].price_ksh=Number($('adminProdPrice').value)||0; arr[idx].description=$('adminProdDesc').value.trim(); save(KEY_PRODS,arr); renderProducts(); renderAdminProducts(); clearProdForm(); alert('Product updated.'); }
+function deleteProduct(id){ if(!confirm('Delete product?')) return; let arr=load(KEY_PRODS,[]); arr=arr.filter(x=>String(x.id)!==String(id)); save(KEY_PRODS,arr); renderProducts(); renderAdminProducts(); }
+
+// import products
+function importProductsPrompt(){ const txt=prompt('Paste products JSON array to import (will overwrite current products).'); if(!txt) return; try{ const arr=JSON.parse(txt); if(!Array.isArray(arr)) throw new Error('Not an array'); save(KEY_PRODS, arr); renderProducts(); renderAdminProducts(); alert('Products imported.'); } catch(e){ alert('Invalid JSON: '+e.message); } }
+
+// payments admin
+function addPay(){ const name=$('payHolder').value.trim(); if(!name) return alert('Name required'); const type=$('payType').value; const number=$('payNumber').value.trim(); const notes=$('payNotes').value.trim(); const arr=load(KEY_PAYS,[]); arr.unshift({ id:Date.now(), name, type, number, notes }); save(KEY_PAYS, arr); renderAdminPays(); renderPaymentsPublic(); clearPayForm(); alert('Payment account added.'); }
+function clearPayForm(){ $('payHolder').value=''; $('payType').value='M-Pesa'; $('payNumber').value=''; $('payNotes').value=''; $('updatePayBtn').style.display='none'; $('addPayBtn').style.display='inline-block'; delete $('addPayBtn').dataset.editId; }
+function renderAdminPays(){ const arr=load(KEY_PAYS,[]); const div=$('adminPaysList'); div.innerHTML=''; if(!arr.length){ div.innerHTML='<div class="small muted">No accounts</div>'; return; } arr.forEach(p=>{ const n=document.createElement('div'); n.style.display='flex'; n.style.justifyContent='space-between'; n.style.alignItems='center'; n.style.marginBottom='8px'; n.innerHTML=`<div><strong>${esc(p.name)}</strong><div class="small muted">${esc(p.type)} • ${esc(maskNumber(p.number))}</div></div><div style="display:flex;gap:6px"><button class="btn" onclick="editPay(${p.id})">Edit</button><button class="btn secondary" onclick="deletePay(${p.id})">Delete</button></div>`; div.appendChild(n); }); }
+function editPay(id){ const arr=load(KEY_PAYS,[]); const p=arr.find(x=>String(x.id)===String(id)); if(!p) return alert('Not found'); $('payHolder').value=p.name; $('payType').value=p.type; $('payNumber').value=p.number; $('payNotes').value=p.notes; $('addPayBtn').dataset.editId=id; $('updatePayBtn').style.display='inline-block'; $('addPayBtn').style.display='none'; }
+function deletePay(id){ if(!confirm('Delete account?')) return; let arr=load(KEY_PAYS,[]); arr=arr.filter(x=>String(x.id)!==String(id)); save(KEY_PAYS,arr); renderAdminPays(); renderPaymentsPublic(); }
+
+// mask
+function maskNumber(s){ if(!s) return ''; const st=String(s).trim(); return st.length<=4 ? '****'+st : '****'+st.slice(-4); }
+
+// orders & statuses
+function renderAdminOrders(){ const arr=load(KEY_ORDERS,[]); const div=$('adminOrders'); div.innerHTML=''; if(!arr.length){ div.innerHTML='<div class="small muted">No orders</div>'; return; } arr.forEach(o=>{ const node=document.createElement('div'); node.style.borderBottom='1px solid rgba(255,255,255,0.03)'; node.style.padding='8px'; node.style.marginBottom='8px'; const itemsText=o.items.map(it=>`${it.name} × ${it.qty}`).join(', '); const cls = o.status==='pending' ? 'status-pending' : (o.status==='paid' ? 'status-paid' : (o.status==='shipped' ? 'status-shipped' : 'status-delivered')); node.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${esc(o.customer.name)}</strong><div class="small muted">${esc(o.customer.phone)}</div></div><div class="${cls} status-pill">${esc(o.status.toUpperCase())}</div></div><div class="muted small" style="margin-top:8px">${itemsText}</div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><div><strong>Total:</strong> Ksh ${Number(o.total_ksh).toLocaleString()}</div><div class="small muted">Payment: ${esc(o.payment_method)}</div></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn" onclick="viewOrder(${o.id})">View</button><button class="btn secondary" onclick="changeOrderStatus(${o.id},'paid')">Mark Paid</button><button class="btn secondary" onclick="changeOrderStatus(${o.id},'shipped')">Mark Shipped</button><button class="btn secondary" onclick="changeOrderStatus(${o.id},'delivered')">Mark Delivered</button><button class="btn secondary" onclick="deleteOrder(${o.id})">Delete</button></div>`; div.appendChild(node); }); }
+function viewOrder(id){ const arr=load(KEY_ORDERS,[]); const o=arr.find(x=>String(x.id)===String(id)); if(!o) return alert('Not found'); alert(`Order #${o.id}\nPlaced: ${new Date(o.ts).toLocaleString()}\nCustomer: ${o.customer.name}\nPhone: ${o.customer.phone}\nLocation: ${o.customer.location}\nNote: ${o.customer.note||''}\n\nItems:\n${o.items.map(it=>`${it.name} × ${it.qty} — Ksh ${(it.price_ksh * it.qty).toLocaleString()}`).join('\n')}\n\nTotal: Ksh ${o.total_ksh}\nPayment: ${o.payment_method}\nStatus: ${o.status}`); }
+function changeOrderStatus(id,status){ const arr=load(KEY_ORDERS,[]); const idx=arr.findIndex(x=>String(x.id)===String(id)); if(idx===-1) return; arr[idx].status=status; save(KEY_ORDERS,arr); renderAdminOrders(); alert('Order status updated to: ' + status); }
+function deleteOrder(id){ if(!confirm('Delete order?')) return; let arr=load(KEY_ORDERS,[]); arr=arr.filter(x=>String(x.id)!==String(id)); save(KEY_ORDERS,arr); renderAdminOrders(); }
+
+// messages
+function renderAdminMessages(){ const arr=load(KEY_MSGS,[]); const div=$('adminMessagesList'); div.innerHTML=''; if(!arr.length){ div.innerHTML='<div class="small muted">No messages</div>'; return; } arr.forEach(m=>{ const n=document.createElement('div'); n.style.borderBottom='1px solid rgba(255,255,255,0.03)'; n.style.padding='8px'; n.style.marginBottom='8px'; n.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${esc(m.name)}</strong> <span class="small muted">(${esc(m.email)})</span></div><div class="small muted">${new Date(m.ts).toLocaleString()}</div></div><div style="margin-top:8px">${esc(m.message)}</div>`; div.appendChild(n); }); }
+
+// admin lists render
+function renderAdminLists(){ const site=load(KEY_SITE,{}); $('adminBrand').value=site.brand||''; $('adminHero').value=site.hero||''; $('adminAbout').value=site.about||''; $('adminLocation').value=site.location||''; $('adminPublicEmail').value=site.publicEmail||''; $('adminLogoUrl').value=site.logoData||''; renderAdminProducts(); renderAdminPays(); renderAdminOrders(); renderAdminMessages(); const adm=load(KEY_ADMIN,{}); $('adminEmailInput').value=adm.email||''; $('adminDefaultDest').value=adm.defaultDest||''; $('adminShowFull').checked=!!adm.showFull; }
+
+// admin settings
+function saveAdminSettings(){ const adm=load(KEY_ADMIN,{}); adm.email=$('adminEmailInput').value.trim(); adm.defaultDest=$('adminDefaultDest').value.trim(); adm.showFull=!!$('adminShowFull').checked; save(KEY_ADMIN,adm); const site=load(KEY_SITE,{}); site.publicEmail=adm.email||site.publicEmail; save(KEY_SITE,site); renderSite(); alert('Admin settings saved.'); }
+async function changeAdminPassword(){ const np=$('newAdminPass').value.trim(); if(!np) return alert('Enter new password'); const h=await sha256Hex(np); const adm=load(KEY_ADMIN,{}); adm.passwordHash=h; save(KEY_ADMIN,adm); $('newAdminPass').value=''; alert('Password changed locally.'); }
+
+// Export / Import ALL
+function exportAllBackup(){ const backup = { site: load(KEY_SITE,{}), products: load(KEY_PRODS,[]), payments: load(KEY_PAYS,[]), orders: load(KEY_ORDERS,[]), messages: load(KEY_MSGS,[]), admin: load(KEY_ADMIN,{}), meta:{ exportedAt:new Date().toISOString(), version:'gac_v3_offline' } }; downloadFile(JSON.stringify(backup,null,2),'gac_backup_all.json'); }
+function importAllPrompt(){ const txt = prompt('Paste full backup JSON to import (will overwrite local data).'); if(!txt) return; try{ const b = JSON.parse(txt); if('site' in b) save(KEY_SITE,b.site); if('products' in b) save(KEY_PRODS,b.products); if('payments' in b) save(KEY_PAYS,b.payments); if('orders' in b) save(KEY_ORDERS,b.orders); if('messages' in b) save(KEY_MSGS,b.messages); if('admin' in b) save(KEY_ADMIN,b.admin); alert('Backup imported.'); renderAll(); } catch(e){ alert('Import failed: ' + e.message); } }
+
+// export helpers
+function downloadFile(content, filename){ const blob = new Blob([content], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+// Admin product/pay render helpers (wrap)
+function renderAdminProducts(){ renderAdminProducts(); } // placeholder to avoid duplicate declarations
+function renderAdminPays(){ renderAdminPays(); }         // placeholder
+
+// Convertors (offline)
+function populateConverter(){
+  const rates = load(KEY_RATES, { rates: {} }).rates;
+  const conv = $('convTo'); conv.innerHTML = '';
+  for(const k in rates){ const opt=document.createElement('option'); opt.value=k; opt.textContent=k; conv.appendChild(opt); }
+  if(conv.options.length) conv.value = conv.options[0].value;
+}
+function convertFromKsh(){
+  const amount = Number($('convAmount').value)||0;
+  const to = $('convTo').value;
+  const rates = load(KEY_RATES, { rates: {} }).rates;
+  if(!rates[to]) return alert('Rate not available offline.');
+  const converted = (amount * rates[to]).toFixed(2);
+  alert(`Ksh ${amount.toLocaleString()} ≈ ${to} ${Number(converted).toLocaleString()} (rate KES→${to}: ${rates[to]})`);
+}
+
+// render admin products/paylists properly (defined after main functions to avoid redefinition issues)
+function renderAdminProducts(){
+  const arr = load(KEY_PRODS,[]);
+  const list = $('adminProductsList'); list.innerHTML='';
+  if(!arr.length){ list.innerHTML = '<div class="small muted">No products</div>'; return; }
+  arr.forEach(p=>{
+    const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.marginBottom='8px';
+    row.innerHTML = `<div><strong>${esc(p.name)}</strong><div class="small muted">Ksh ${Number(p.price_ksh).toLocaleString()}</div></div><div style="display:flex;gap:6px"><button class="btn" onclick="editProduct(${p.id})">Edit</button><button class="btn secondary" onclick="deleteProduct(${p.id})">Delete</button></div>`;
+    list.appendChild(row);
+  });
+}
+
+function renderAdminPays(){
+  const arr = load(KEY_PAYS,[]); const div = $('adminPaysList'); div.innerHTML='';
+  if(!arr.length){ div.innerHTML = '<div class="small muted">No accounts</div>'; return; }
+  arr.forEach(p=>{
+    const node = document.createElement('div'); node.style.display='flex'; node.style.justifyContent='space-between'; node.style.alignItems='center'; node.style.marginBottom='8px';
+    node.innerHTML = `<div><strong>${esc(p.name)}</strong><div class="small muted">${esc(p.type)} • ${esc(maskNumber(p.number))}</div></div><div style="display:flex;gap:6px"><button class="btn" onclick="editPay(${p.id})">Edit</button><button class="btn secondary" onclick="deletePay(${p.id})">Delete</button></div>`;
+    div.appendChild(node);
+  });
+}
+
+// edit product/pay helpers exposed globally
+window.editProduct = function(id){ const arr=load(KEY_PRODS,[]); const p=arr.find(x=>String(x.id)===String(id)); if(!p) return alert('Not found'); $('adminProdImage').value=p.image||''; $('adminProdName').value=p.name||''; $('adminProdPrice').value=p.price_ksh||''; $('adminProdDesc').value=p.description||''; $('addProductBtn').dataset.editId=id; $('updateProductBtn').style.display='inline-block'; $('addProductBtn').style.display='none'; }
+window.deleteProduct = function(id){ if(!confirm('Delete product?')) return; let arr=load(KEY_PRODS,[]); arr=arr.filter(x=>String(x.id)!==String(id)); save(KEY_PRODS,arr); renderProducts(); renderAdminProducts(); }
+window.editPay = function(id){ const arr=load(KEY_PAYS,[]); const p=arr.find(x=>String(x.id)===String(id)); if(!p) return alert('Not found'); $('payHolder').value=p.name; $('payType').value=p.type; $('payNumber').value=p.number; $('payNotes').value=p.notes; $('addPayBtn').dataset.editId=id; $('updatePayBtn').style.display='inline-block'; $('addPayBtn').style.display='none'; }
+window.deletePay = function(id){ if(!confirm('Delete account?')) return; let arr=load(KEY_PAYS,[]); arr=arr.filter(x=>String(x.id)!==String(id)); save(KEY_PAYS,arr); renderAdminPays(); renderPaymentsPublic(); }
+
+// pay admin functions
+function addPay(){ const name=$('payHolder').value.trim(); if(!name) return alert('Name required'); const type=$('payType').value; const number=$('payNumber').value.trim(); const notes=$('payNotes').value.trim(); const arr=load(KEY_PAYS,[]); arr.unshift({ id:Date.now(), name, type, number, notes }); save(KEY_PAYS,arr); renderAdminPays(); renderPaymentsPublic(); clearPayForm(); alert('Account saved.'); }
+function clearPayForm(){ $('payHolder').value=''; $('payType').value='M-Pesa'; $('payNumber').value=''; $('payNotes').value=''; $('updatePayBtn').style.display='none'; $('addPayBtn').style.display='inline-block'; delete $('addPayBtn').dataset.editId; }
+
+// admin lists wrapper
+function renderAdminLists(){ renderAdminProducts(); renderAdminPays(); renderAdminOrders(); renderAdminMessages(); const site=load(KEY_SITE,{}); $('adminBrand').value=site.brand||''; $('adminHero').value=site.hero||''; $('adminAbout').value=site.about||''; $('adminLocation').value=site.location||''; $('adminPublicEmail').value=site.publicEmail||''; $('adminLogoUrl').value=site.logoData||''; const adm=load(KEY_ADMIN,{}); $('adminEmailInput').value=adm.email||''; $('adminDefaultDest').value=adm.defaultDest||''; $('adminShowFull').checked=!!adm.showFull; }
+
+// change password
+async function changeAdminPassword(){ const np=$('newAdminPass').value.trim(); if(!np) return alert('Enter new password'); const h=await sha256Hex(np); const adm=load(KEY_ADMIN,{}); adm.passwordHash=h; save(KEY_ADMIN,adm); $('newAdminPass').value=''; alert('Password changed locally.'); }
+
+// export/import all implemented earlier (exportAllBackup, importAllPrompt)
+function exportAllBackup(){ const backup={ site: load(KEY_SITE,{}), products: load(KEY_PRODS,[]), payments: load(KEY_PAYS,[]), orders: load(KEY_ORDERS,[]), messages: load(KEY_MSGS,[]), admin: load(KEY_ADMIN,{}), meta:{ exportedAt:new Date().toISOString(), version:'gac_v3_offline' } }; downloadFile(JSON.stringify(backup,null,2),'gac_backup_all.json'); }
+function importAllPrompt(){ const txt=prompt('Paste full backup JSON to import (will overwrite local data).'); if(!txt) return; try{ const b=JSON.parse(txt); if('site' in b) save(KEY_SITE,b.site); if('products' in b) save(KEY_PRODS,b.products); if('payments' in b) save(KEY_PAYS,b.payments); if('orders' in b) save(KEY_ORDERS,b.orders); if('messages' in b) save(KEY_MSGS,b.messages); if('admin' in b) save(KEY_ADMIN,b.admin); alert('Backup imported.'); renderAll(); } catch(e){ alert('Import failed: '+e.message); } }
+
+// convertors (offline rates)
+function populateConverter(){ const table = load(KEY_RATES,{rates:{}}).rates; const sel = $('convTo'); sel.innerHTML=''; for(const k in table){ const opt=document.createElement('option'); opt.value=k; opt.textContent=k; sel.appendChild(opt); } if(sel.options.length) sel.value = sel.options[0].value; }
+function convertFromKsh(){ const amount=Number($('convAmount').value)||0; const to=$('convTo').value; const table = load(KEY_RATES,{rates:{}}).rates; if(!table[to]) return alert('Rate unavailable offline'); const converted=(amount * table[to]).toFixed(2); alert(`Ksh ${amount.toLocaleString()} ≈ ${to} ${Number(converted).toLocaleString()} (rate KES→${to}: ${table[to]})`); }
+
+// triple-tap bottom-right detection for mobile
+let lastTap = 0; let tapCount = 0;
+function initTripleTap(){
+  // attach to whole document, but check coordinates near bottom-right
+  document.addEventListener('touchend', (e)=>{
+    const t = Date.now();
+    const touch = e.changedTouches[0];
+    const vw = window.innerWidth; const vh = window.innerHeight;
+    const x = touch.clientX; const y = touch.clientY;
+    const margin = 120; // area size bottom-right
+    if(x > vw - margin && y > vh - margin){
+      if(t - lastTap < 500){ tapCount++; } else { tapCount = 1; }
+      lastTap = t;
+      if(tapCount >= 3){ openAdminModal(); tapCount = 0; }
+    } else {
+      tapCount = 0;
+    }
+  });
+}
+
+// Small helpers for UI availability
+// Make admin dot accessible: add aria, enlarge clickable area slightly on hover
+$('adminDot').addEventListener && $('adminDot').addEventListener('mouseenter', ()=> $('adminDot').classList.add('glow'));
+$('adminDot').addEventListener && $('adminDot').addEventListener('mouseleave', ()=> $('adminDot').classList.remove('glow'));
+
+// Render initial UI lists now
+renderAll();
+populateConverter();
+
+</script>
+</body>
+</html>
